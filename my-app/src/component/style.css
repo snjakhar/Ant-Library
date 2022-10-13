@@ -1,0 +1,19 @@
+.ant-modal{
+    top:20px;
+}
+.table-box {
+    border: 2px solid grey;
+    margin: 20px;
+}
+.ant-table-thead tr th {
+    background-color: lightskyblue;
+}
+.create-report-button{
+   float: right;
+    margin-right: 20px;
+    width: 40px;
+    height: 40px;
+}
+.hubbler{
+   text-align: center;
+}

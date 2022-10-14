@@ -4,7 +4,7 @@ import React from "react";
 
 export const FormFooter = ({selectedReportInfo, handleCancel}) => {
 
-    return <Form.Item wrapperCol={{span:16, offset: 8}}>
+    return <Form.Item wrapperCol={{span: 16, offset: 8}}>
         <Space
         >
             <Button type="primary" htmlType="submit">

@@ -9,7 +9,9 @@ import {FormFooter} from "./FormFooter";
 
 
 const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport}) => {
+
     const [isModalOpen, setIsModalOpen] = useState(true);
+
     const handleCancel = () => {
         setIsModalOpen(false);
         toggleCreateOrOpenReport()
@@ -19,14 +21,14 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
         values.phone = values.prefix + -+values.phone;
         if (!isEmpty(selectedReportInfo)) {
 
-            let afterRemoveEmptyValues = Object.keys(values).filter((key)=>!!values[key])
-            let newValues=pick(values, afterRemoveEmptyValues);
+            let afterRemoveEmptyValues = Object.keys(values).filter((key) => !!values[key])
+            let newValues = pick(values, afterRemoveEmptyValues);
 
 
             let payload = {...newValues, _id: selectedReportInfo._id}
             updateReportAPiCall(payload).then((res) => {
                 message.success('Report Updated Successfully')
-               getReports();
+                getReports();
                 setIsModalOpen(false)
             })
 
@@ -42,6 +44,7 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
 
 
     };
+
     const prefixSelector = (
         <Form.Item name="prefix" noStyle>
             <Select
@@ -51,6 +54,7 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
             </Select>
         </Form.Item>
     );
+
     const checkFieldType = (type, field) => {
         switch (type) {
             case 'text':
@@ -64,6 +68,18 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
             case 'paragraph':
                 return <Input.TextArea/>
             case 'dropdown':
+                if (field["multi-select"]) {
+                    return <Select
+                        allowClear
+                        mode="multiple"
+                    >
+                        {
+                            field.options.map(({_id, label}) => {
+                                return <Option key={_id} value={label}>{label}</Option>
+                            })
+                        }
+                    </Select>
+                }
                 return <Select
                     allowClear
                 >
@@ -78,6 +94,7 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
 
         }
     }
+
     const createFormItem = (field) => {
 
         return <Form.Item label={field.label || field._id}
@@ -85,7 +102,8 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
                           rules={[{
                               required: field.required,
                           }, {
-                              type: field.type === 'text' ? 'string' : field.type === 'dropdown' ? "" : field.type,
+                              type: field.type === 'text' ? 'string' : field.type === 'dropdown' ?
+                                  field['multi-select'] ? 'array' : '' : field.type,
                               min: field.minLength || field.min,
                               max: field.maxLength || field.max,
                           }]}

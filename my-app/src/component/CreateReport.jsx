@@ -2,13 +2,14 @@ import {Form, Input, Modal, Select, InputNumber, Space, Switch, message} from 'a
 import React, {useState} from 'react';
 import 'antd/dist/antd.css'
 import {Option} from "antd/es/mentions";
-import { postReportApiCall, updateReportAPiCall} from "./apiCalls";
+import {postReportApiCall, updateReportAPiCall} from "./apiCalls";
 import {isEmpty, pick, pickBy} from "lodash";
 import './style.css'
 import {FormFooter} from "./FormFooter";
+import {checkFieldType, createFormItem} from "./helper";
 
 
-const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport,handleLoading}) => {
+const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport, handleLoading}) => {
 
     const [isModalOpen, setIsModalOpen] = useState(true);
 
@@ -32,12 +33,10 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
                 setIsModalOpen(false)
             })
 
-        }
-
-      else{
-           handleLoading()
+        } else {
+            handleLoading()
             postReportApiCall(values).then((res) => {
-               getReports();
+                getReports();
                 message.success('Report Created Successfully')
                 handleLoading()
                 setIsModalOpen(false)
@@ -47,72 +46,6 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
 
     };
 
-    const prefixSelector = (
-        <Form.Item name="prefix" noStyle>
-            <Select
-            >
-                <Option value="+91">+91</Option>
-                <Option value="+41">+41</Option>
-            </Select>
-        </Form.Item>
-    );
-
-    const checkFieldType = (type, field) => {
-        switch (type) {
-            case 'text':
-                return <Input/>
-            case 'number':
-                return <InputNumber/>
-            case 'phone':
-                return <Input
-                    addonBefore={prefixSelector}
-                />
-            case 'paragraph':
-                return <Input.TextArea/>
-            case 'dropdown':
-                if (field["multi-select"]) {
-                    return <Select
-                        allowClear
-                        mode="multiple"
-                    >
-                        {
-                            field.options.map(({_id, label}) => {
-                                return <Option key={_id} value={label}>{label}</Option>
-                            })
-                        }
-                    </Select>
-                }
-                return <Select
-                    allowClear
-                >
-                    {
-                        field.options.map(({_id, label}) => {
-                            return <Option value={label}>{label}</Option>
-                        })
-                    }
-                </Select>
-            default:
-                return <Input/>
-
-        }
-    }
-
-    const createFormItem = (field) => {
-
-        return <Form.Item label={field.label || field._id}
-                          name={field._id}
-                          rules={[{
-                              required: field.required,
-                          }, {
-                              type: field.type === 'text' ? 'string' : field.type === 'dropdown' ?
-                                  field['multi-select'] ? 'array' : '' : field.type,
-                              min: field.minLength || field.min,
-                              max: field.maxLength || field.max,
-                          }]}
-        >
-            {checkFieldType(field.type, field)}
-        </Form.Item>
-    }
 
     return (
         <>

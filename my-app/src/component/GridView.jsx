@@ -61,10 +61,9 @@ export const GridView = () => {
     }
 
     const deleteReport = (id) => {
-        handleLoading()
         deleteReportApiCall(id).then(({data: {success}}) => {
                 message.success('Report deleted successfully')
-                updateReports([id])
+                getReports()
             }
         )
     }
@@ -97,7 +96,7 @@ export const GridView = () => {
         })
     }
     const updateReports = (ids) => {
-        let filteredReports = reports.filter(({_id}) => !ids.includes(_id))
+        let filteredReports = reports.filter(({_id}) => ids.includes(_id))
         setReports(filteredReports)
         handleLoading()
     }

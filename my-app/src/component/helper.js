@@ -15,3 +15,7 @@ export const formatMetaData = (data) => {
     })
     return arrangeData;
 }
+
+export const formatReportsData=(data)=>{
+  data.map(report=>report['key']=report._id)
+}

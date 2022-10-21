@@ -8,7 +8,7 @@ import './style.css'
 import {FormFooter} from "./FormFooter";
 
 
-const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport}) => {
+const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport,handleLoading}) => {
 
     const [isModalOpen, setIsModalOpen] = useState(true);
 
@@ -35,9 +35,11 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
         }
 
       else{
+           handleLoading()
             postReportApiCall(values).then((res) => {
                getReports();
                 message.success('Report Created Successfully')
+                handleLoading()
                 setIsModalOpen(false)
             })
         }

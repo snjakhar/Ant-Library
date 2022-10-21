@@ -12,3 +12,8 @@ export const deleteReportApiCall = id => axios.delete(REPORTS_URL, {data: {_id: 
 export const postReportApiCall = payload => axios.post(REPORTS_URL, payload)
 
 export const updateReportAPiCall = payload => axios.patch(`${REPORTS_URL}${payload._id}/` ,payload)
+
+export const multipleDeleteApiCall=(selectedIds)=>{
+    let createMultiDeleteAxiosReq = selectedIds.map((id)=>axios.delete(REPORTS_URL,{data: {_id: id}}))
+    return  axios.all(createMultiDeleteAxiosReq)
+}

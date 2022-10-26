@@ -25,7 +25,6 @@ export const formatReportsData=(data)=>{
         report ['key']=report._id
         if(report['hobbies'])report["hobbies"]=report.hobbies.map(h=>` ${h}, `)
     })
-    debugger
 }
 
 export const  createFormItem = (field) => {

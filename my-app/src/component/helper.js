@@ -21,7 +21,6 @@ export const formatMetaData = (data) => {
 }
 
 export const formatReportsData=(data)=>{
-  data.map(report=>report['key']=report._id)
     data.forEach((report)=>{
         report ['key']=report._id
         if(report['hobbies'])report["hobbies"]=report.hobbies.map(h=>` ${h}, `)

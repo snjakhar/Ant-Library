@@ -61,6 +61,7 @@ export const GridView = () => {
     }
 
     const deleteReport = (id) => {
+        handleLoading()
         deleteReportApiCall(id).then(({data: {success}}) => {
                 message.success('Report deleted successfully')
                 getReports()

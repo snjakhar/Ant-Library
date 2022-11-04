@@ -1,6 +1,11 @@
-import {Form, Input, InputNumber, Select} from "antd";
+import {Button, Form, Input, InputNumber, Popover, Select, Space, Tag} from "antd";
 import {Option} from "antd/es/mentions";
 import React from "react";
+import {MinusCircleOutlined, PlusOutlined, TableOutlined} from "@ant-design/icons";
+import {CreateProductReport} from "./CreateProductReport";
+import {isArray} from "lodash";
+import {ProductModal} from "./ProductModal";
+import {ProductGridView} from "./ProductGridView";
 
 export const formatMetaData = (data) => {
 
@@ -9,6 +14,26 @@ export const formatMetaData = (data) => {
         switch (type) {
             case 'configuration':
                 arrangeData = configuration.map((field) => {
+                    if(field['repeating']||field['multi-select'])
+                        return {...field, dataIndex: field._id, title: field.label||field._id, key: field._id,width:field['repeating']?"13%":null,
+                               render:(values)=>{
+                                        if(isArray(values)){
+                                            return values.map(v=><Tag color="geekblue">{v}</Tag>)
+                                        }
+                               }
+
+                    }
+                    else if (field.type === 'repeating') {
+                        debugger
+                        return {
+                            ...field, dataIndex: field._id, title: field.label || field._id, key: field._id,
+                            render: (record) => isArray(record) &&
+                                <ProductModal productMetaData={formatProductMetaData(field.fields)}
+                                              productReports={formatReportsData(record)}/>
+                        }
+
+
+                    }
                     return {...field, dataIndex: field._id, title: field.label || field._id, key: field._id}
                 })
                 break;
@@ -21,48 +46,96 @@ export const formatMetaData = (data) => {
 }
 
 export const formatReportsData=(data)=>{
-    data.forEach((report)=>{
-        report ['key']=report._id
-        if(report['hobbies'])report["hobbies"]=report.hobbies.map(h=>` ${h}, `)
+    return data.map((report)=>{
+        return {...report,key:report._id}
     })
 }
+export const formatProductMetaData=(data)=>{
+   let fData=data.map((field)=>{
+        return {...field,dataIndex:field._id,title:field.label,key:field._id}
+    })
+    fData.pop();
+    return fData;
+}
 
-export const  createFormItem = (field) => {
+export const  createFormItem = (field,getCurrentAddedProductsData) => {
 
     return <Form.Item label={field.label || field._id}
                       name={field._id}
                       rules={[{
-                          required: field.required,
+                          required: field.type==='repeating'?false:field.required,
                       }, {
                           type: field.type === 'text' ? 'string' : field.type === 'dropdown' ?
-                              field['multi-select'] ? 'array' : '' : field.type,
+                              field['multi-select'] ? 'array' : '' :field['repeating']?'array': field.type,
                           min: field.minLength || field.min,
                           max: field.maxLength || field.max,
                       }]}
     >
-        {checkFieldType(field.type, field)}
+        {checkFieldType(field.type, field,getCurrentAddedProductsData)}
     </Form.Item>
 }
-const prefixSelector = (
-    <Form.Item name="prefix" noStyle>
-        <Select
-        >
-            <Option value="+91">+91</Option>
-            <Option value="+41">+41</Option>
-        </Select>
-    </Form.Item>
-);
+// const prefixSelector = (
+//     <Form.Item name="prefix" noStyle>
+//         <Select
+//         >
+//             <Option value="+91">+91</Option>
+//             <Option value="+41">+41</Option>
+//         </Select>
+//     </Form.Item>
+// );
 
-export const checkFieldType = (type, field) => {
+export const checkFieldType = (type, field,getCurrentAddedProductsData) => {
     switch (type) {
         case 'text':
             return <Input/>
         case 'number':
             return <InputNumber/>
         case 'phone':
-            return <Input
-                addonBefore={prefixSelector}
-            />
+            return  <Form.List name="phone" >
+                {(fields, { add, remove }) => (
+                    <>
+                        {fields.map(({key,name},i) => (
+                            <Space
+                                key={key}
+                                align="baseline"
+                            >
+                                <Form.Item
+                                    name={[name]}
+                                >
+                                    <Input  placeholder="Enter Phone Number" />
+                                </Form.Item>
+                                {i!==0&&<MinusCircleOutlined onClick={() => remove(name)} />}
+                            </Space>
+                        ))}
+                        <Form.Item>
+                            <Button style={{float:"right"}} type={'primary'} shape={"circle"}  onClick={() => add()} icon={<PlusOutlined/>}></Button>
+                        </Form.Item>
+                    </>
+                )}
+            </Form.List>
+        case 'email':
+            return <Form.List name="email">
+                {(fields, { add, remove }) => (
+                    <>
+                        {fields.map(({ key, name },i) => (
+                            <Space
+                                key={key}
+                                align="baseline"
+                            >
+                                <Form.Item
+                                    name={[name]}
+                                >
+                                    <Input type={'emFail'} placeholder="Enter Email" />
+                                </Form.Item>
+                                {i!==0&&<MinusCircleOutlined onClick={() => remove(name)} />}
+                            </Space>
+                        ))}
+                        <Form.Item>
+                            <Button style={{float:"right"}}  type={'primary'} shape={"circle"}  onClick={() => add()} icon={<PlusOutlined/>}></Button>
+                        </Form.Item>
+                    </>
+                )}
+            </Form.List>
         case 'paragraph':
             return <Input.TextArea/>
         case 'dropdown':
@@ -87,8 +160,15 @@ export const checkFieldType = (type, field) => {
                     })
                 }
             </Select>
+
+        case 'repeating':
+            return <ProductGridView metaData={formatProductMetaData(field.fields)} reports={[]} getCurrentAddedProductsData={getCurrentAddedProductsData}/>
+
         default:
             return <Input/>
 
     }
 }
+
+
+

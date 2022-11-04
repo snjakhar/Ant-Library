@@ -8,7 +8,7 @@ import './style.css'
 import {FormFooter} from "./FormFooter";
 import {checkFieldType, createFormItem} from "./helper";
 
-
+let newAddedProducts=[]
 const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport, handleLoading}) => {
 
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -19,7 +19,7 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
     };
 
     const onFinish = (values) => {
-        values.phone = values.prefix + -+values.phone;
+        debugger
         if (!isEmpty(selectedReportInfo)) {
 
             let afterRemoveEmptyValues = Object.keys(values).filter((key) => !!values[key])
@@ -35,6 +35,7 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
 
         } else {
             handleLoading()
+            values.products=newAddedProducts;
             postReportApiCall(values).then((res) => {
                 getReports();
                 message.success('Report Created Successfully')
@@ -46,7 +47,9 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
 
     };
 
-
+   const getCurrentAddedProductsData=(data)=>{
+       newAddedProducts=data;
+   }
     return (
         <>
             <Modal footer={null} title="Fill Form" open={isModalOpen} onCancel={handleCancel}>
@@ -54,14 +57,14 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
                     onFinish={onFinish}
                     initialValues={selectedReportInfo}
                     labelCol={{"span": 5}}
-                    wrapperCol={{"span": 15}}
+                    wrapperCol={{"span":18}}
                     layout="horizontal"
                     size='small'
                 >
                     {
                         metaData.map((field, i) => {
                             if (i !== metaData.length - 1)
-                                return createFormItem(field)
+                                return createFormItem(field,getCurrentAddedProductsData)
                         })
                     }
                     <FormFooter handleCancel={handleCancel} selectedReportInfo={selectedReportInfo}/>

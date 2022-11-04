@@ -2,7 +2,7 @@ import {Table} from "antd";
 import React, {useState} from "react";
 import {CreateProductReport} from "./CreateProductReport";
 
-export const ProductGridView=({metaData,reports,getCurrentAddedProductsData})=>{
+export const ProductGridView=({metaData,reports,getCurrentAddedProductsData,editMode=false,allReports})=>{
     const [pReports,setPReports]=useState(reports)
     const updateProductReports=(values)=>{
         values.key=values.product_name;
@@ -11,11 +11,12 @@ export const ProductGridView=({metaData,reports,getCurrentAddedProductsData})=>{
     }
     return <>
         <Table
-            className={'table-box'} bordered={true}
+            bordered={true}
+            className={'prodcut-table'}
             columns={metaData}
             dataSource={pReports}
             pagination={false}
         />
-        {!reports.length&&<CreateProductReport updateProductReports={updateProductReports}/>}
+        {editMode&&<CreateProductReport updateProductReports={updateProductReports} metaData={metaData} allReports={allReports}/>}
     </>
 }

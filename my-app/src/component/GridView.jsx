@@ -76,7 +76,8 @@ export const GridView = () => {
         getReports,
         selectedReportInfo,
         toggleCreateOrOpenReport,
-        handleLoading
+        handleLoading,
+        reports
     }
 
     const rowSelection = {

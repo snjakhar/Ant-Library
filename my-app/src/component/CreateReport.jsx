@@ -6,11 +6,10 @@ import {postReportApiCall, updateReportAPiCall} from "./apiCalls";
 import {isEmpty, pick, pickBy} from "lodash";
 import './style.css'
 import {FormFooter} from "./FormFooter";
-import {checkFieldType, createFormItem} from "./helper";
+import { createFormItem} from "./helper";
 
 let newAddedProducts=[]
-const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport, handleLoading}) => {
-
+const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrOpenReport, handleLoading,reports}) => {
     const [isModalOpen, setIsModalOpen] = useState(true);
 
     const handleCancel = () => {
@@ -19,7 +18,6 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
     };
 
     const onFinish = (values) => {
-        debugger
         if (!isEmpty(selectedReportInfo)) {
 
             let afterRemoveEmptyValues = Object.keys(values).filter((key) => !!values[key])
@@ -64,7 +62,7 @@ const CreateReport = ({metaData, getReports, selectedReportInfo, toggleCreateOrO
                     {
                         metaData.map((field, i) => {
                             if (i !== metaData.length - 1)
-                                return createFormItem(field,getCurrentAddedProductsData)
+                                return createFormItem(field,getCurrentAddedProductsData,selectedReportInfo,reports)
                         })
                     }
                     <FormFooter handleCancel={handleCancel} selectedReportInfo={selectedReportInfo}/>

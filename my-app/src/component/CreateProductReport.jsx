@@ -1,51 +1,15 @@
 import {Button, Form, Input, InputNumber, Popover} from 'antd';
 import React, { useState } from 'react';
-import {ProductGridView} from "./ProductGridView";
 
-const data=[
-    {
-        _id:"product_name",
-        label:"Product Name",
-        type:"text",
-        required:true
-    },
-    {
-        _id:"sku",
-        label:"Stock Keeping Unit (SKU)",
-        type:"text",
-        required:true
-    },
-    {
-        _id:"price",
-        label:"Price per Qty",
-        type:"number",
-        required:true
-    },
-    {
-        _id:"quantity",
-        label:"Quantity",
-        type:"number",
-        required:true
-    }
-]
-
-export const CreateProductReport = ({updateProductReports}) => {
+export const CreateProductReport = ({updateProductReports,metaData,allReports}) => {
 
     const [open, setOpen] = useState(false);
-
-
-
     const handleOpenChange = (newOpen) => setOpen(newOpen);
-
-    const addProductReports=(values)=>{
-        updateProductReports(values)
-    }
-
 
     return (
         <>
             <Popover
-                content={<ProductForm data={data} addProductReports={addProductReports}/>}
+                content={<ProductForm data={metaData} addProductReports={updateProductReports} allReports={allReports}/>}
                 placement={'right'}
                 trigger="click"
                 open={open}
@@ -56,11 +20,19 @@ export const CreateProductReport = ({updateProductReports}) => {
         </>
     );
 };
-const ProductForm = ({data,addProductReports}) => {
+let sku='';
+const ProductForm = ({data,addProductReports,allReports}) => {
 
-    const onFinish=(values)=>{
-        console.log(values)
-        addProductReports(values)
+    const onFinish=(values)=>addProductReports(values)
+
+    const onChange=(e)=>{
+        // if(e.target.id==='basic_sku')sku=e.target.value;
+        // console.log(e)
+        console.log(e)
+    }
+
+    const isUnique=()=>{
+
     }
     return <Form
         name="basic"
@@ -71,19 +43,24 @@ const ProductForm = ({data,addProductReports}) => {
             span: 10,
         }}
         onFinish={onFinish}
+        onKeyUp={onChange}
     >
         {
             data.map((field)=>{
                 return  <Form.Item
                     label={field.label}
                     name={field._id}
-                    rules={[
+                    rules={field._id!=='sku'?[
                         {
-                            required: field['required'],
-                        },
-                    ]}
+                            required: field.required
+                        }
+                    ]:[{
+                        required:true,
+                        type:'number',
+                        message:"Enter Unique Number"
+                    }]}
                 >
-                    {field.type==='text'?<Input/>:<InputNumber/>}
+                    {field._id==='sku'?<InputNumber/>:(field.type==='text'?<Input/>:<InputNumber/>)}
                 </Form.Item>
             })
         }

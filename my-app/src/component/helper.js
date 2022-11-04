@@ -1,8 +1,7 @@
 import {Button, Form, Input, InputNumber, Popover, Select, Space, Tag} from "antd";
 import {Option} from "antd/es/mentions";
 import React from "react";
-import {MinusCircleOutlined, PlusOutlined, TableOutlined} from "@ant-design/icons";
-import {CreateProductReport} from "./CreateProductReport";
+import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {isArray} from "lodash";
 import {ProductModal} from "./ProductModal";
 import {ProductGridView} from "./ProductGridView";
@@ -24,15 +23,12 @@ export const formatMetaData = (data) => {
 
                     }
                     else if (field.type === 'repeating') {
-                        debugger
                         return {
                             ...field, dataIndex: field._id, title: field.label || field._id, key: field._id,
                             render: (record) => isArray(record) &&
                                 <ProductModal productMetaData={formatProductMetaData(field.fields)}
-                                              productReports={formatReportsData(record)}/>
+                                              productReports={formatProductsReports(record)}/>
                         }
-
-
                     }
                     return {...field, dataIndex: field._id, title: field.label || field._id, key: field._id}
                 })
@@ -45,11 +41,20 @@ export const formatMetaData = (data) => {
     return arrangeData;
 }
 
-export const formatReportsData=(data)=>{
+export const formatProductsReports=(data=[])=>{
+
     return data.map((report)=>{
         return {...report,key:report._id}
     })
 }
+
+export const formatReportsData=(data)=>{
+
+    return data.map((report)=>{
+        return report.key=report._id;
+    })
+}
+
 export const formatProductMetaData=(data)=>{
    let fData=data.map((field)=>{
         return {...field,dataIndex:field._id,title:field.label,key:field._id}
@@ -58,7 +63,7 @@ export const formatProductMetaData=(data)=>{
     return fData;
 }
 
-export const  createFormItem = (field,getCurrentAddedProductsData) => {
+export const  createFormItem = (field,getCurrentAddedProductsData,selectedReportInfo,reports) => {
 
     return <Form.Item label={field.label || field._id}
                       name={field._id}
@@ -71,7 +76,7 @@ export const  createFormItem = (field,getCurrentAddedProductsData) => {
                           max: field.maxLength || field.max,
                       }]}
     >
-        {checkFieldType(field.type, field,getCurrentAddedProductsData)}
+        {checkFieldType(field.type, field,getCurrentAddedProductsData,selectedReportInfo,reports)}
     </Form.Item>
 }
 // const prefixSelector = (
@@ -84,7 +89,7 @@ export const  createFormItem = (field,getCurrentAddedProductsData) => {
 //     </Form.Item>
 // );
 
-export const checkFieldType = (type, field,getCurrentAddedProductsData) => {
+export const checkFieldType = (type, field,getCurrentAddedProductsData,selectedReportInfo,reports) => {
     switch (type) {
         case 'text':
             return <Input/>
@@ -162,8 +167,7 @@ export const checkFieldType = (type, field,getCurrentAddedProductsData) => {
             </Select>
 
         case 'repeating':
-            return <ProductGridView metaData={formatProductMetaData(field.fields)} reports={[]} getCurrentAddedProductsData={getCurrentAddedProductsData}/>
-
+            return <ProductGridView metaData={formatProductMetaData(field.fields)} reports={formatProductsReports(selectedReportInfo.products)} getCurrentAddedProductsData={getCurrentAddedProductsData} editMode={true} allReports={reports}/>
         default:
             return <Input/>
 
